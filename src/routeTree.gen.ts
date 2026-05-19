@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as MisTicketsRouteImport } from './routes/mis-tickets'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as HomeRouteImport } from './routes/home'
 import { Route as CrearTicketRouteImport } from './routes/crear-ticket'
 import { Route as BandejaSoporteRouteImport } from './routes/bandeja-soporte'
 import { Route as IndexRouteImport } from './routes/index'
@@ -30,11 +29,6 @@ const MisTicketsRoute = MisTicketsRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HomeRoute = HomeRouteImport.update({
-  id: '/home',
-  path: '/home',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CrearTicketRoute = CrearTicketRouteImport.update({
@@ -57,7 +51,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/bandeja-soporte': typeof BandejaSoporteRoute
   '/crear-ticket': typeof CrearTicketRoute
-  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/mis-tickets': typeof MisTicketsRoute
   '/timeline': typeof TimelineRoute
@@ -66,7 +59,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/bandeja-soporte': typeof BandejaSoporteRoute
   '/crear-ticket': typeof CrearTicketRoute
-  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/mis-tickets': typeof MisTicketsRoute
   '/timeline': typeof TimelineRoute
@@ -76,7 +68,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/bandeja-soporte': typeof BandejaSoporteRoute
   '/crear-ticket': typeof CrearTicketRoute
-  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/mis-tickets': typeof MisTicketsRoute
   '/timeline': typeof TimelineRoute
@@ -87,7 +78,6 @@ export interface FileRouteTypes {
     | '/'
     | '/bandeja-soporte'
     | '/crear-ticket'
-    | '/home'
     | '/login'
     | '/mis-tickets'
     | '/timeline'
@@ -96,7 +86,6 @@ export interface FileRouteTypes {
     | '/'
     | '/bandeja-soporte'
     | '/crear-ticket'
-    | '/home'
     | '/login'
     | '/mis-tickets'
     | '/timeline'
@@ -105,7 +94,6 @@ export interface FileRouteTypes {
     | '/'
     | '/bandeja-soporte'
     | '/crear-ticket'
-    | '/home'
     | '/login'
     | '/mis-tickets'
     | '/timeline'
@@ -115,7 +103,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BandejaSoporteRoute: typeof BandejaSoporteRoute
   CrearTicketRoute: typeof CrearTicketRoute
-  HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
   MisTicketsRoute: typeof MisTicketsRoute
   TimelineRoute: typeof TimelineRoute
@@ -142,13 +129,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/home': {
-      id: '/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/crear-ticket': {
@@ -179,7 +159,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BandejaSoporteRoute: BandejaSoporteRoute,
   CrearTicketRoute: CrearTicketRoute,
-  HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
   MisTicketsRoute: MisTicketsRoute,
   TimelineRoute: TimelineRoute,
@@ -187,3 +166,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
