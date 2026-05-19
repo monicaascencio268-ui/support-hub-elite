@@ -22,6 +22,6 @@ export function clearUsuario() {
 
 export function homeForRole(rol: string): string {
   if (rol === "soporte") return "/bandeja-soporte";
-  if (rol === "administrador") return "/home";
+  if (rol === "administrador") return "/admin";
   return "/mis-tickets";
 }
