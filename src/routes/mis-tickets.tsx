@@ -22,6 +22,7 @@ function MisTickets() {
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [reject, setReject] = useState<Ticket | null>(null);
+  const [toast, setToast] = useState<{ msg: string; v: "success" | "error" } | null>(null);
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -39,15 +40,15 @@ function MisTickets() {
   useEffect(() => { void reload(); }, [reload]);
 
   const aprobar = async (t: Ticket) => {
-    try { await api.validarTicket(t.id); await reload(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
+    try { await api.validarTicket(t.id); setToast({ msg: `Ticket #${t.id} aprobado`, v: "success" }); await reload(); }
+    catch (e) { setToast({ msg: e instanceof Error ? e.message : "Error", v: "error" }); }
   };
   const confirmReject = async (motivo: string) => {
     if (!reject) return;
     const id = reject.id;
     setReject(null);
-    try { await api.rechazarTicket(id, motivo); await reload(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
+    try { await api.rechazarTicket(id, motivo); setToast({ msg: `Ticket #${id} rechazado`, v: "success" }); await reload(); }
+    catch (e) { setToast({ msg: e instanceof Error ? e.message : "Error", v: "error" }); }
   };
 
   return (
