@@ -5,6 +5,7 @@ const STYLES: Record<string, string> = {
   DEVUELTO: "bg-status-returned/15 text-status-returned",
   FINALIZADO: "bg-status-finished/15 text-status-finished",
   RECHAZADO: "bg-status-rejected/15 text-status-rejected",
+  VALIDADO: "bg-status-validated/15 text-status-validated",
 };
 
 export function StatusBadge({ estado }: { estado: string }) {
