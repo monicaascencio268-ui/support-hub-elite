@@ -28,6 +28,14 @@ export interface LogEntry {
   fecha: string;
 }
 
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     headers: { "Content-Type": "application/json", ...(init.headers || {}) },
@@ -35,7 +43,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`${res.status} ${res.statusText} — ${text || path}`);
+    throw new ApiError(res.status, text || `${res.status} ${res.statusText}`);
   }
   const ct = res.headers.get("content-type") || "";
   if (ct.includes("application/json")) return res.json() as Promise<T>;
@@ -59,6 +67,8 @@ export const api = {
 
   // Tickets
   listTickets: () => request<Ticket[]>("/tickets"),
+  listTicketsByUsuario: (id: number, rol: string) =>
+    request<Ticket[]>(`/tickets/usuario/${id}/${rol}`),
   createTicket: (t: { correlativo: string; detalles: string; id_solicitante: number }) =>
     request<Ticket>("/tickets", { method: "POST", body: JSON.stringify(t) }),
   aceptarTicket: (id: number, soporteId: number) =>

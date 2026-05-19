@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { api } from "@/lib/api";
+import { ApiError, api } from "@/lib/api";
 import { homeForRole, setUsuario } from "@/lib/auth";
 
 export const Route = createFileRoute("/login")({
@@ -25,7 +25,8 @@ function LoginPage() {
       setUsuario(usuario);
       navigate({ to: homeForRole(usuario.rol) });
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Credenciales inválidas");
+      if (e instanceof ApiError && e.status === 401) setErr("Credenciales incorrectas");
+      else setErr(e instanceof Error ? e.message : "No se pudo iniciar sesión");
     } finally {
       setLoading(false);
     }
@@ -33,12 +34,11 @@ function LoginPage() {
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      {/* Brand */}
       <div className="relative hidden overflow-hidden border-r border-border/60 lg:block">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,oklch(0.78_0.14_200/0.25),transparent_50%),radial-gradient(circle_at_80%_80%,oklch(0.6_0.18_280/0.2),transparent_50%)]" />
         <div className="relative flex h-full flex-col justify-between p-12">
           <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground font-bold">IT</div>
+            <TicketIcon className="h-10 w-10 rounded-xl bg-primary p-2 text-primary-foreground" />
             <div>
               <div className="font-semibold tracking-tight">IT Support</div>
               <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Ticket Console</div>
@@ -59,7 +59,6 @@ function LoginPage() {
         </div>
       </div>
 
-      {/* Form */}
       <div className="flex items-center justify-center px-6 py-12">
         <form onSubmit={submit} className="w-full max-w-sm space-y-6">
           <div>
@@ -70,7 +69,7 @@ function LoginPage() {
           <div className="space-y-3">
             <Field label="Correo">
               <input
-                type="email" required value={email}
+                type="email" required value={email} autoComplete="email"
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-md border border-input bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-ring/40"
                 placeholder="tu@empresa.com"
@@ -78,7 +77,7 @@ function LoginPage() {
             </Field>
             <Field label="Contraseña">
               <input
-                type="password" required value={contrasena}
+                type="password" required value={contrasena} autoComplete="current-password"
                 onChange={(e) => setContrasena(e.target.value)}
                 className="w-full rounded-md border border-input bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-ring/40"
               />
@@ -86,9 +85,7 @@ function LoginPage() {
           </div>
 
           {err && (
-            <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
-              {err}
-            </p>
+            <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">{err}</p>
           )}
 
           <button
@@ -109,5 +106,15 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</span>
       {children}
     </label>
+  );
+}
+
+export function TicketIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+      strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z" />
+      <path d="M13 6v12" strokeDasharray="2 2" />
+    </svg>
   );
 }

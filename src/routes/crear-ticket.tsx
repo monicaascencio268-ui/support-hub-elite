@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Shell } from "@/components/Shell";
-import { api } from "@/lib/api";
+import { ApiError, api } from "@/lib/api";
 import { getUsuario } from "@/lib/auth";
 
 export const Route = createFileRoute("/crear-ticket")({
@@ -19,7 +19,6 @@ function CrearTicket() {
   const [detalles, setDetalles] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [okId, setOkId] = useState<number | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,10 +28,11 @@ function CrearTicket() {
     setLoading(true);
     try {
       const t = await api.createTicket({ correlativo, detalles, id_solicitante: user.id });
-      setOkId(t.id);
-      setTimeout(() => navigate({ to: "/mis-tickets" }), 1200);
+      alert(`Ticket creado con ID #${t.id}`);
+      navigate({ to: "/mis-tickets" });
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "No se pudo crear el ticket");
+      if (e instanceof ApiError && e.status === 400) setErr(e.message || "Datos inválidos. Revisa los campos.");
+      else setErr(e instanceof Error ? e.message : "No se pudo crear el ticket");
     } finally {
       setLoading(false);
     }
@@ -68,11 +68,6 @@ function CrearTicket() {
 
         {err && (
           <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">{err}</p>
-        )}
-        {okId && (
-          <p className="rounded-md border border-status-finished/40 bg-status-finished/10 px-3 py-2 text-xs text-status-finished">
-            Ticket creado con ID #{okId}. Redirigiendo…
-          </p>
         )}
 
         <div className="flex justify-end gap-2">

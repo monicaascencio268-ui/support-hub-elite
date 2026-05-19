@@ -12,9 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as MisTicketsRouteImport } from './routes/mis-tickets'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as HomeRouteImport } from './routes/home'
 import { Route as CrearTicketRouteImport } from './routes/crear-ticket'
 import { Route as BandejaSoporteRouteImport } from './routes/bandeja-soporte'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TimelineRoute = TimelineRouteImport.update({
@@ -32,11 +32,6 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HomeRoute = HomeRouteImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CrearTicketRoute = CrearTicketRouteImport.update({
   id: '/crear-ticket',
   path: '/crear-ticket',
@@ -47,6 +42,11 @@ const BandejaSoporteRoute = BandejaSoporteRouteImport.update({
   path: '/bandeja-soporte',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -55,18 +55,18 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/bandeja-soporte': typeof BandejaSoporteRoute
   '/crear-ticket': typeof CrearTicketRoute
-  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/mis-tickets': typeof MisTicketsRoute
   '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/bandeja-soporte': typeof BandejaSoporteRoute
   '/crear-ticket': typeof CrearTicketRoute
-  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/mis-tickets': typeof MisTicketsRoute
   '/timeline': typeof TimelineRoute
@@ -74,9 +74,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/bandeja-soporte': typeof BandejaSoporteRoute
   '/crear-ticket': typeof CrearTicketRoute
-  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/mis-tickets': typeof MisTicketsRoute
   '/timeline': typeof TimelineRoute
@@ -85,27 +85,27 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/bandeja-soporte'
     | '/crear-ticket'
-    | '/home'
     | '/login'
     | '/mis-tickets'
     | '/timeline'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/bandeja-soporte'
     | '/crear-ticket'
-    | '/home'
     | '/login'
     | '/mis-tickets'
     | '/timeline'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/bandeja-soporte'
     | '/crear-ticket'
-    | '/home'
     | '/login'
     | '/mis-tickets'
     | '/timeline'
@@ -113,9 +113,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   BandejaSoporteRoute: typeof BandejaSoporteRoute
   CrearTicketRoute: typeof CrearTicketRoute
-  HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
   MisTicketsRoute: typeof MisTicketsRoute
   TimelineRoute: typeof TimelineRoute
@@ -144,13 +144,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/home': {
-      id: '/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof HomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/crear-ticket': {
       id: '/crear-ticket'
       path: '/crear-ticket'
@@ -165,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BandejaSoporteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -177,9 +177,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   BandejaSoporteRoute: BandejaSoporteRoute,
   CrearTicketRoute: CrearTicketRoute,
-  HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
   MisTicketsRoute: MisTicketsRoute,
   TimelineRoute: TimelineRoute,
