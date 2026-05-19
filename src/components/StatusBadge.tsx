@@ -1,28 +1,19 @@
-import type { TicketStatus } from "@/lib/ticket-types";
-
-const map: Record<TicketStatus, { label: string; bg: string; text: string; dot: string }> = {
-  CREADO:      { label: "Creado",      bg: "bg-status-created/15",    text: "text-status-created",    dot: "bg-status-created" },
-  ASIGNADO:    { label: "Asignado",    bg: "bg-status-assigned/15",   text: "text-status-assigned",   dot: "bg-status-assigned" },
-  VALIDACION:  { label: "Validación",  bg: "bg-status-validation/15", text: "text-status-validation", dot: "bg-status-validation" },
-  DEVUELTO:    { label: "Devuelto",    bg: "bg-status-returned/15",   text: "text-status-returned",   dot: "bg-status-returned" },
-  FINALIZADO:  { label: "Finalizado",  bg: "bg-status-finished/15",   text: "text-status-finished",   dot: "bg-status-finished" },
-  RECHAZADO:   { label: "Rechazado",   bg: "bg-status-rejected/15",   text: "text-status-rejected",   dot: "bg-status-rejected" },
+const STYLES: Record<string, string> = {
+  CREADO: "bg-status-created/15 text-status-created",
+  ASIGNADO: "bg-status-assigned/15 text-status-assigned",
+  VALIDACION: "bg-status-validation/15 text-status-validation",
+  DEVUELTO: "bg-status-returned/15 text-status-returned",
+  FINALIZADO: "bg-status-finished/15 text-status-finished",
+  RECHAZADO: "bg-status-rejected/15 text-status-rejected",
 };
 
-export function StatusBadge({ status, size = "sm" }: { status: TicketStatus; size?: "sm" | "md" }) {
-  const s = map[status];
+export function StatusBadge({ estado }: { estado: string }) {
+  const key = (estado || "").toUpperCase();
+  const cls = STYLES[key] ?? "bg-muted text-muted-foreground";
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full font-medium ${s.bg} ${s.text} ${
-        size === "md" ? "px-3 py-1 text-xs" : "px-2 py-0.5 text-[11px]"
-      }`}
-    >
-      <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
-      {s.label}
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${cls}`}>
+      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+      {key || "—"}
     </span>
   );
 }
-
-export const STATUS_LIST: TicketStatus[] = [
-  "CREADO", "ASIGNADO", "VALIDACION", "DEVUELTO", "FINALIZADO", "RECHAZADO",
-];
