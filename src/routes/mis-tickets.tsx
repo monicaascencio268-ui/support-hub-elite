@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { Shell } from "@/components/Shell";
 import { TicketTable } from "@/components/TicketTable";
+import { PromptModal } from "@/components/PromptModal";
+import { Spinner } from "@/components/Feedback";
 import { api, type Ticket } from "@/lib/api";
 import { getUsuario } from "@/lib/auth";
 
@@ -18,26 +20,32 @@ function MisTickets() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reject, setReject] = useState<Ticket | null>(null);
 
   const reload = useCallback(async () => {
     setLoading(true);
     try {
       const user = getUsuario();
-      const all = await api.listTickets();
-      setTickets(user ? all.filter((t) => t.id_solicitante === user.id) : all);
+      if (!user) return;
+      const data = await api.listTicketsByUsuario(user.id, user.rol);
+      setTickets(Array.isArray(data) ? data : []);
       setErr(null);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Error cargando tickets");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { void reload(); }, [reload]);
 
-  const validar = async (t: Ticket) => {
-    if (!confirm(`¿Aprobar la solución del ticket #${t.id}?`)) return;
+  const aprobar = async (t: Ticket) => {
     try { await api.validarTicket(t.id); await reload(); }
+    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
+  };
+  const confirmReject = async (motivo: string) => {
+    if (!reject) return;
+    const id = reject.id;
+    setReject(null);
+    try { await api.rechazarTicket(id, motivo); await reload(); }
     catch (e) { alert(e instanceof Error ? e.message : "Error"); }
   };
 
@@ -46,7 +54,7 @@ function MisTickets() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Mis tickets</h1>
-          <p className="text-sm text-muted-foreground">Tickets que has creado.</p>
+          <p className="text-sm text-muted-foreground">Tus solicitudes y su estado actual.</p>
         </div>
         <Link
           to="/crear-ticket"
@@ -58,20 +66,32 @@ function MisTickets() {
 
       {err && <ErrorBox message={err} />}
       {loading ? (
-        <div className="rounded-xl border border-border bg-surface/60 p-12 text-center text-sm text-muted-foreground">
-          Cargando tickets…
-        </div>
+        <Spinner />
       ) : (
         <TicketTable
           tickets={tickets}
           getActions={(t) =>
-            (t.estado || "").toUpperCase() === "FINALIZADO"
-              ? [{ kind: "validar", onClick: validar }]
+            (t.estado || "").toUpperCase() === "VALIDACION"
+              ? [
+                  { kind: "aprobar", onClick: aprobar },
+                  { kind: "rechazar", onClick: (tk) => setReject(tk) },
+                ]
               : []
           }
           empty="Aún no has creado tickets."
         />
       )}
+
+      <PromptModal
+        open={!!reject}
+        title={`Rechazar ticket #${reject?.id ?? ""}`}
+        description="La solución no resolvió tu incidencia. Cuéntale al soporte qué sigue pasando."
+        placeholder="Describe el motivo del rechazo…"
+        confirmLabel="Rechazar"
+        variant="danger"
+        onCancel={() => setReject(null)}
+        onConfirm={confirmReject}
+      />
     </div>
   );
 }
@@ -81,7 +101,7 @@ export function ErrorBox({ message }: { message: string }) {
     <div className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
       {message}
       <p className="mt-1 text-xs opacity-80">
-        Verifica que tu backend esté en <code className="font-mono">http://localhost:8080/ITProject/it</code> y con CORS habilitado.
+        Verifica que tu backend esté disponible en <code className="font-mono">http://localhost:8080/ITProject/it</code> con CORS habilitado.
       </p>
     </div>
   );
