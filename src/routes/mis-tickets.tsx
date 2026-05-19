@@ -4,6 +4,7 @@ import { Shell } from "@/components/Shell";
 import { TicketTable } from "@/components/TicketTable";
 import { PromptModal } from "@/components/PromptModal";
 import { Spinner } from "@/components/Feedback";
+import { Toast } from "@/components/Toast";
 import { api, type Ticket } from "@/lib/api";
 import { getUsuario } from "@/lib/auth";
 
