@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Shell } from "@/components/Shell";
 import { api, type LogEntry } from "@/lib/api";
@@ -15,7 +15,6 @@ export const Route = createFileRoute("/timeline")({
 
 function Timeline() {
   const { id } = Route.useSearch();
-  const navigate = useNavigate();
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -45,7 +44,7 @@ function Timeline() {
           <p className="text-sm text-muted-foreground">Historial cronológico del ticket.</p>
         </div>
         <button
-          onClick={() => navigate({ to: ".." as any })}
+          onClick={() => window.history.back()}
           className="rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-secondary hover:text-foreground"
         >
           ← Volver
