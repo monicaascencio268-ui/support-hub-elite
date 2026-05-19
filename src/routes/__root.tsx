@@ -9,7 +9,6 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
-import { AppProvider } from "@/lib/app-store";
 
 function NotFoundComponent() {
   return (
@@ -114,9 +113,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AppProvider>
-        <Outlet />
-      </AppProvider>
+      <Outlet />
     </QueryClientProvider>
   );
 }

@@ -9,20 +9,42 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TimelineRouteImport } from './routes/timeline'
+import { Route as MisTicketsRouteImport } from './routes/mis-tickets'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as AppRouteImport } from './routes/_app'
+import { Route as HomeRouteImport } from './routes/home'
+import { Route as CrearTicketRouteImport } from './routes/crear-ticket'
+import { Route as BandejaSoporteRouteImport } from './routes/bandeja-soporte'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
-import { Route as AppTicketsNewRouteImport } from './routes/_app.tickets.new'
-import { Route as AppTicketsIdRouteImport } from './routes/_app.tickets.$id'
 
+const TimelineRoute = TimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MisTicketsRoute = MisTicketsRouteImport.update({
+  id: '/mis-tickets',
+  path: '/mis-tickets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppRoute = AppRouteImport.update({
-  id: '/_app',
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CrearTicketRoute = CrearTicketRouteImport.update({
+  id: '/crear-ticket',
+  path: '/crear-ticket',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BandejaSoporteRoute = BandejaSoporteRouteImport.update({
+  id: '/bandeja-soporte',
+  path: '/bandeja-soporte',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -30,68 +52,91 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppDashboardRoute = AppDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppTicketsNewRoute = AppTicketsNewRouteImport.update({
-  id: '/tickets/new',
-  path: '/tickets/new',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppTicketsIdRoute = AppTicketsIdRouteImport.update({
-  id: '/tickets/$id',
-  path: '/tickets/$id',
-  getParentRoute: () => AppRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bandeja-soporte': typeof BandejaSoporteRoute
+  '/crear-ticket': typeof CrearTicketRoute
+  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
-  '/dashboard': typeof AppDashboardRoute
-  '/tickets/$id': typeof AppTicketsIdRoute
-  '/tickets/new': typeof AppTicketsNewRoute
+  '/mis-tickets': typeof MisTicketsRoute
+  '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bandeja-soporte': typeof BandejaSoporteRoute
+  '/crear-ticket': typeof CrearTicketRoute
+  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
-  '/dashboard': typeof AppDashboardRoute
-  '/tickets/$id': typeof AppTicketsIdRoute
-  '/tickets/new': typeof AppTicketsNewRoute
+  '/mis-tickets': typeof MisTicketsRoute
+  '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_app': typeof AppRouteWithChildren
+  '/bandeja-soporte': typeof BandejaSoporteRoute
+  '/crear-ticket': typeof CrearTicketRoute
+  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
-  '/_app/dashboard': typeof AppDashboardRoute
-  '/_app/tickets/$id': typeof AppTicketsIdRoute
-  '/_app/tickets/new': typeof AppTicketsNewRoute
+  '/mis-tickets': typeof MisTicketsRoute
+  '/timeline': typeof TimelineRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/dashboard' | '/tickets/$id' | '/tickets/new'
+  fullPaths:
+    | '/'
+    | '/bandeja-soporte'
+    | '/crear-ticket'
+    | '/home'
+    | '/login'
+    | '/mis-tickets'
+    | '/timeline'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/dashboard' | '/tickets/$id' | '/tickets/new'
+  to:
+    | '/'
+    | '/bandeja-soporte'
+    | '/crear-ticket'
+    | '/home'
+    | '/login'
+    | '/mis-tickets'
+    | '/timeline'
   id:
     | '__root__'
     | '/'
-    | '/_app'
+    | '/bandeja-soporte'
+    | '/crear-ticket'
+    | '/home'
     | '/login'
-    | '/_app/dashboard'
-    | '/_app/tickets/$id'
-    | '/_app/tickets/new'
+    | '/mis-tickets'
+    | '/timeline'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppRoute: typeof AppRouteWithChildren
+  BandejaSoporteRoute: typeof BandejaSoporteRoute
+  CrearTicketRoute: typeof CrearTicketRoute
+  HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
+  MisTicketsRoute: typeof MisTicketsRoute
+  TimelineRoute: typeof TimelineRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/timeline': {
+      id: '/timeline'
+      path: '/timeline'
+      fullPath: '/timeline'
+      preLoaderRoute: typeof TimelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mis-tickets': {
+      id: '/mis-tickets'
+      path: '/mis-tickets'
+      fullPath: '/mis-tickets'
+      preLoaderRoute: typeof MisTicketsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -99,11 +144,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app': {
-      id: '/_app'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AppRouteImport
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crear-ticket': {
+      id: '/crear-ticket'
+      path: '/crear-ticket'
+      fullPath: '/crear-ticket'
+      preLoaderRoute: typeof CrearTicketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bandeja-soporte': {
+      id: '/bandeja-soporte'
+      path: '/bandeja-soporte'
+      fullPath: '/bandeja-soporte'
+      preLoaderRoute: typeof BandejaSoporteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -113,49 +172,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/dashboard': {
-      id: '/_app/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AppDashboardRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/tickets/new': {
-      id: '/_app/tickets/new'
-      path: '/tickets/new'
-      fullPath: '/tickets/new'
-      preLoaderRoute: typeof AppTicketsNewRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/tickets/$id': {
-      id: '/_app/tickets/$id'
-      path: '/tickets/$id'
-      fullPath: '/tickets/$id'
-      preLoaderRoute: typeof AppTicketsIdRouteImport
-      parentRoute: typeof AppRoute
-    }
   }
 }
 
-interface AppRouteChildren {
-  AppDashboardRoute: typeof AppDashboardRoute
-  AppTicketsIdRoute: typeof AppTicketsIdRoute
-  AppTicketsNewRoute: typeof AppTicketsNewRoute
-}
-
-const AppRouteChildren: AppRouteChildren = {
-  AppDashboardRoute: AppDashboardRoute,
-  AppTicketsIdRoute: AppTicketsIdRoute,
-  AppTicketsNewRoute: AppTicketsNewRoute,
-}
-
-const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppRoute: AppRouteWithChildren,
+  BandejaSoporteRoute: BandejaSoporteRoute,
+  CrearTicketRoute: CrearTicketRoute,
+  HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
+  MisTicketsRoute: MisTicketsRoute,
+  TimelineRoute: TimelineRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
