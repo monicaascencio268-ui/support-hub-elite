@@ -71,6 +71,9 @@ function CrearTicket() {
         {err && (
           <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">{err}</p>
         )}
+        {ok && (
+          <p className="rounded-md border border-status-finished/40 bg-status-finished/10 px-3 py-2 text-xs text-status-finished">{ok}</p>
+        )}
 
         <div className="flex justify-end gap-2">
           <Link to="/mis-tickets" className="rounded-md border border-border px-4 py-2 text-sm text-muted-foreground hover:text-foreground">
