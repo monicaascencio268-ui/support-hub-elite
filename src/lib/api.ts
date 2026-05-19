@@ -28,13 +28,6 @@ export interface LogEntry {
   fecha: string;
 }
 
-export interface LogEntry {
-  id?: number;
-  accion: string;
-  descripcion: string;
-  fecha: string;
-}
-
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
@@ -74,6 +67,8 @@ export const api = {
 
   // Tickets
   listTickets: () => request<Ticket[]>("/tickets"),
+  listTicketsByUsuario: (id: number, rol: string) =>
+    request<Ticket[]>(`/tickets/usuario/${id}/${rol}`),
   createTicket: (t: { correlativo: string; detalles: string; id_solicitante: number }) =>
     request<Ticket>("/tickets", { method: "POST", body: JSON.stringify(t) }),
   aceptarTicket: (id: number, soporteId: number) =>
