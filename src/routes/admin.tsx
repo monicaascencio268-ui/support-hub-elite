@@ -106,11 +106,12 @@ function AdminPanel() {
 function UsuariosTable({ usuarios, onChanged }: { usuarios: Usuario[]; onChanged: () => void }) {
   const [confirmU, setConfirmU] = useState<Usuario | null>(null);
 
+  const [delErr, setDelErr] = useState<string | null>(null);
   const doDelete = async () => {
     if (!confirmU) return;
     const id = confirmU.id; setConfirmU(null);
-    try { await api.deleteUsuario(id); onChanged(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
+    try { await api.deleteUsuario(id); setDelErr(null); onChanged(); }
+    catch (e) { setDelErr(e instanceof Error ? e.message : "Error eliminando usuario"); }
   };
 
   return (
