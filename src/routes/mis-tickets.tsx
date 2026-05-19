@@ -94,6 +94,11 @@ function MisTickets() {
         onCancel={() => setReject(null)}
         onConfirm={confirmReject}
       />
+      <Toast
+        message={toast?.msg ?? null}
+        variant={toast?.v ?? "success"}
+        onClose={() => setToast(null)}
+      />
     </div>
   );
 }
