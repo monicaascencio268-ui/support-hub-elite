@@ -24,7 +24,7 @@ function AdminPanel() {
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [reject, setReject] = useState<Ticket | null>(null);
-  const [validate, setValidate] = useState<Ticket | null>(null);
+  const [toast, setToast] = useState<{ msg: string; v: "success" | "error" } | null>(null);
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -42,18 +42,17 @@ function AdminPanel() {
 
   const aceptar = async (t: Ticket) => {
     const u = getUsuario(); if (!u) return;
-    try { await api.aceptarTicket(t.id, u.id); await reload(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
+    try { await api.aceptarTicket(t.id, u.id); setToast({ msg: `Ticket #${t.id} aceptado`, v: "success" }); await reload(); }
+    catch (e) { setToast({ msg: e instanceof Error ? e.message : "Error", v: "error" }); }
+  };
+  const enviarValidacion = async (t: Ticket) => {
+    try { await api.finalizarTicket(t.id); setToast({ msg: `Ticket #${t.id} enviado a validación`, v: "success" }); await reload(); }
+    catch (e) { setToast({ msg: e instanceof Error ? e.message : "Error", v: "error" }); }
   };
   const confirmReject = async (motivo: string) => {
     if (!reject) return; const id = reject.id; setReject(null);
-    try { await api.rechazarTicket(id, motivo); await reload(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
-  };
-  const confirmValidate = async (_obs: string) => {
-    if (!validate) return; const id = validate.id; setValidate(null);
-    try { await api.finalizarTicket(id); await reload(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
+    try { await api.rechazarTicket(id, motivo); setToast({ msg: `Ticket #${id} rechazado`, v: "success" }); await reload(); }
+    catch (e) { setToast({ msg: e instanceof Error ? e.message : "Error", v: "error" }); }
   };
 
   return (
@@ -79,7 +78,7 @@ function AdminPanel() {
         ) : (
           <TicketTable
             tickets={tickets}
-            getActions={(t) => actionsForSoporte(t, { aceptar, reject: setReject, validate: setValidate })}
+            getActions={(t) => actionsForSoporte(t, { aceptar, reject: setReject, enviarValidacion })}
           />
         )}
       </section>
