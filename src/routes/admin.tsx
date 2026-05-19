@@ -117,6 +117,7 @@ function UsuariosTable({ usuarios, onChanged }: { usuarios: Usuario[]; onChanged
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface/60">
       <div className="border-b border-border/60 px-4 py-3 text-sm font-semibold">Usuarios</div>
+      {delErr && <div className="border-b border-destructive/30 bg-destructive/10 px-4 py-2 text-xs text-destructive">{delErr}</div>}
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-surface-elevated/60 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
