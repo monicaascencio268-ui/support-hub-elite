@@ -37,6 +37,7 @@
   --color-status-returned: var(--status-returned);
   --color-status-finished: var(--status-finished);
   --color-status-rejected: var(--status-rejected);
+  --color-status-validated: var(--status-validated);
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
