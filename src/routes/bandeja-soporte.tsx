@@ -4,11 +4,12 @@ import { Shell } from "@/components/Shell";
 import { TicketTable } from "@/components/TicketTable";
 import { PromptModal } from "@/components/PromptModal";
 import { Spinner } from "@/components/Feedback";
+import { Toast } from "@/components/Toast";
 import { api, type Ticket } from "@/lib/api";
 import { getUsuario } from "@/lib/auth";
 import { ErrorBox } from "./mis-tickets";
 
-const ESTADOS = ["TODOS", "CREADO", "ASIGNADO", "VALIDACION", "DEVUELTO", "FINALIZADO", "RECHAZADO"];
+const ESTADOS = ["TODOS", "CREADO", "ASIGNADO", "VALIDACION", "DEVUELTO", "FINALIZADO", "RECHAZADO", "VALIDADO"];
 
 export const Route = createFileRoute("/bandeja-soporte")({
   head: () => ({ meta: [{ title: "Bandeja de soporte — IT Support" }] }),
@@ -25,7 +26,7 @@ function Bandeja() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("TODOS");
   const [reject, setReject] = useState<Ticket | null>(null);
-  const [validate, setValidate] = useState<Ticket | null>(null);
+  const [toast, setToast] = useState<{ msg: string; v: "success" | "error" } | null>(null);
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -47,8 +48,12 @@ function Bandeja() {
 
   const aceptar = async (t: Ticket) => {
     const u = getUsuario(); if (!u) return;
-    try { await api.aceptarTicket(t.id, u.id); await reload(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
+    try { await api.aceptarTicket(t.id, u.id); setToast({ msg: `Ticket #${t.id} aceptado`, v: "success" }); await reload(); }
+    catch (e) { setToast({ msg: e instanceof Error ? e.message : "Error", v: "error" }); }
+  };
+  const enviarValidacion = async (t: Ticket) => {
+    try { await api.finalizarTicket(t.id); setToast({ msg: `Ticket #${t.id} enviado a validación`, v: "success" }); await reload(); }
+    catch (e) { setToast({ msg: e instanceof Error ? e.message : "Error", v: "error" }); }
   };
 
   const counts = useMemo(() => {
@@ -63,15 +68,8 @@ function Bandeja() {
   const confirmReject = async (motivo: string) => {
     if (!reject) return;
     const id = reject.id; setReject(null);
-    try { await api.rechazarTicket(id, motivo); await reload(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
-  };
-  const confirmValidate = async (_obs: string) => {
-    if (!validate) return;
-    const id = validate.id; setValidate(null);
-    // observación opcional — la API actual sólo expone PUT /tickets/{id}/finalizar
-    try { await api.finalizarTicket(id); await reload(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
+    try { await api.rechazarTicket(id, motivo); setToast({ msg: `Ticket #${id} rechazado`, v: "success" }); await reload(); }
+    catch (e) { setToast({ msg: e instanceof Error ? e.message : "Error", v: "error" }); }
   };
 
   return (
@@ -103,7 +101,7 @@ function Bandeja() {
       ) : (
         <TicketTable
           tickets={visible}
-          getActions={(t) => actionsForSoporte(t, { aceptar, reject: setReject, validate: setValidate })}
+          getActions={(t) => actionsForSoporte(t, { aceptar, reject: setReject, enviarValidacion })}
         />
       )}
 
@@ -117,15 +115,11 @@ function Bandeja() {
         onCancel={() => setReject(null)}
         onConfirm={confirmReject}
       />
-      <PromptModal
-        open={!!validate}
-        title={`Enviar #${validate?.id ?? ""} a validación`}
-        description="Comparte una observación opcional para el solicitante."
-        placeholder="Observación (opcional)…"
-        confirmLabel="Enviar"
-        required={false}
-        onCancel={() => setValidate(null)}
-        onConfirm={confirmValidate}
+
+      <Toast
+        message={toast?.msg ?? null}
+        variant={toast?.v ?? "success"}
+        onClose={() => setToast(null)}
       />
     </div>
   );
@@ -138,7 +132,7 @@ export function actionsForSoporte(
   h: {
     aceptar: (t: Ticket) => void;
     reject: (t: Ticket) => void;
-    validate: (t: Ticket) => void;
+    enviarValidacion: (t: Ticket) => void;
   },
 ): Action[] {
   const e = (t.estado || "").toUpperCase();
@@ -148,9 +142,6 @@ export function actionsForSoporte(
       { kind: "rechazar", onClick: h.reject },
     ];
   if (e === "ASIGNADO" || e === "DEVUELTO")
-    return [
-      { kind: "validacion", onClick: h.validate },
-      { kind: "rechazar", onClick: h.reject },
-    ];
+    return [{ kind: "validacion", onClick: h.enviarValidacion }];
   return [];
 }

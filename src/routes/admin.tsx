@@ -4,6 +4,7 @@ import { Shell } from "@/components/Shell";
 import { TicketTable } from "@/components/TicketTable";
 import { PromptModal } from "@/components/PromptModal";
 import { Spinner, EmptyState } from "@/components/Feedback";
+import { Toast } from "@/components/Toast";
 import { api, type Role, type Ticket, type Usuario } from "@/lib/api";
 import { getUsuario } from "@/lib/auth";
 import { ErrorBox } from "./mis-tickets";
@@ -24,7 +25,7 @@ function AdminPanel() {
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [reject, setReject] = useState<Ticket | null>(null);
-  const [validate, setValidate] = useState<Ticket | null>(null);
+  const [toast, setToast] = useState<{ msg: string; v: "success" | "error" } | null>(null);
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -42,18 +43,17 @@ function AdminPanel() {
 
   const aceptar = async (t: Ticket) => {
     const u = getUsuario(); if (!u) return;
-    try { await api.aceptarTicket(t.id, u.id); await reload(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
+    try { await api.aceptarTicket(t.id, u.id); setToast({ msg: `Ticket #${t.id} aceptado`, v: "success" }); await reload(); }
+    catch (e) { setToast({ msg: e instanceof Error ? e.message : "Error", v: "error" }); }
+  };
+  const enviarValidacion = async (t: Ticket) => {
+    try { await api.finalizarTicket(t.id); setToast({ msg: `Ticket #${t.id} enviado a validación`, v: "success" }); await reload(); }
+    catch (e) { setToast({ msg: e instanceof Error ? e.message : "Error", v: "error" }); }
   };
   const confirmReject = async (motivo: string) => {
     if (!reject) return; const id = reject.id; setReject(null);
-    try { await api.rechazarTicket(id, motivo); await reload(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
-  };
-  const confirmValidate = async (_obs: string) => {
-    if (!validate) return; const id = validate.id; setValidate(null);
-    try { await api.finalizarTicket(id); await reload(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
+    try { await api.rechazarTicket(id, motivo); setToast({ msg: `Ticket #${id} rechazado`, v: "success" }); await reload(); }
+    catch (e) { setToast({ msg: e instanceof Error ? e.message : "Error", v: "error" }); }
   };
 
   return (
@@ -79,7 +79,7 @@ function AdminPanel() {
         ) : (
           <TicketTable
             tickets={tickets}
-            getActions={(t) => actionsForSoporte(t, { aceptar, reject: setReject, validate: setValidate })}
+            getActions={(t) => actionsForSoporte(t, { aceptar, reject: setReject, enviarValidacion })}
           />
         )}
       </section>
@@ -94,15 +94,10 @@ function AdminPanel() {
         onCancel={() => setReject(null)}
         onConfirm={confirmReject}
       />
-      <PromptModal
-        open={!!validate}
-        title={`Enviar #${validate?.id ?? ""} a validación`}
-        description="Observación opcional para el solicitante."
-        placeholder="Observación (opcional)…"
-        confirmLabel="Enviar"
-        required={false}
-        onCancel={() => setValidate(null)}
-        onConfirm={confirmValidate}
+      <Toast
+        message={toast?.msg ?? null}
+        variant={toast?.v ?? "success"}
+        onClose={() => setToast(null)}
       />
     </div>
   );
@@ -111,16 +106,18 @@ function AdminPanel() {
 function UsuariosTable({ usuarios, onChanged }: { usuarios: Usuario[]; onChanged: () => void }) {
   const [confirmU, setConfirmU] = useState<Usuario | null>(null);
 
+  const [delErr, setDelErr] = useState<string | null>(null);
   const doDelete = async () => {
     if (!confirmU) return;
     const id = confirmU.id; setConfirmU(null);
-    try { await api.deleteUsuario(id); onChanged(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
+    try { await api.deleteUsuario(id); setDelErr(null); onChanged(); }
+    catch (e) { setDelErr(e instanceof Error ? e.message : "Error eliminando usuario"); }
   };
 
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface/60">
       <div className="border-b border-border/60 px-4 py-3 text-sm font-semibold">Usuarios</div>
+      {delErr && <div className="border-b border-destructive/30 bg-destructive/10 px-4 py-2 text-xs text-destructive">{delErr}</div>}
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-surface-elevated/60 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
