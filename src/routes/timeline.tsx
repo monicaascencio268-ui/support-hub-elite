@@ -47,7 +47,7 @@ function Timeline() {
           onClick={() => window.history.back()}
           className="rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-secondary hover:text-foreground"
         >
-          ← Volver
+          ← Regresar
         </button>
       </div>
 
@@ -57,7 +57,8 @@ function Timeline() {
 
       {loading ? (
         <div className="rounded-xl border border-border bg-surface/60 p-10 text-center text-sm text-muted-foreground">
-          Cargando…
+          <span className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-border border-t-primary align-middle" />
+          <span className="ml-3 align-middle">Cargando…</span>
         </div>
       ) : logs.length === 0 ? (
         <div className="rounded-xl border border-border bg-surface/60 p-10 text-center text-sm text-muted-foreground">

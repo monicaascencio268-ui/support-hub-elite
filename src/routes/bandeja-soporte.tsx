@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Shell } from "@/components/Shell";
 import { TicketTable } from "@/components/TicketTable";
+import { PromptModal } from "@/components/PromptModal";
+import { Spinner } from "@/components/Feedback";
 import { api, type Ticket } from "@/lib/api";
 import { getUsuario } from "@/lib/auth";
 import { ErrorBox } from "./mis-tickets";
@@ -11,7 +13,7 @@ const ESTADOS = ["TODOS", "CREADO", "ASIGNADO", "VALIDACION", "DEVUELTO", "FINAL
 export const Route = createFileRoute("/bandeja-soporte")({
   head: () => ({ meta: [{ title: "Bandeja de soporte — IT Support" }] }),
   component: () => (
-    <Shell allow={["soporte", "administrador"]}>
+    <Shell allow={["soporte"]}>
       <Bandeja />
     </Shell>
   ),
@@ -22,11 +24,14 @@ function Bandeja() {
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("TODOS");
+  const [reject, setReject] = useState<Ticket | null>(null);
+  const [validate, setValidate] = useState<Ticket | null>(null);
 
   const reload = useCallback(async () => {
     setLoading(true);
     try {
-      setTickets(await api.listTickets());
+      const data = await api.listTickets();
+      setTickets(Array.isArray(data) ? data : []);
       setErr(null);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Error cargando tickets");
@@ -41,19 +46,8 @@ function Bandeja() {
   );
 
   const aceptar = async (t: Ticket) => {
-    const u = getUsuario();
-    if (!u) return;
+    const u = getUsuario(); if (!u) return;
     try { await api.aceptarTicket(t.id, u.id); await reload(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
-  };
-  const finalizar = async (t: Ticket) => {
-    try { await api.finalizarTicket(t.id); await reload(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
-  };
-  const rechazar = async (t: Ticket) => {
-    const motivo = prompt("Motivo del rechazo:");
-    if (!motivo) return;
-    try { await api.rechazarTicket(t.id, motivo); await reload(); }
     catch (e) { alert(e instanceof Error ? e.message : "Error"); }
   };
 
@@ -65,6 +59,20 @@ function Bandeja() {
     }
     return c;
   }, [tickets]);
+
+  const confirmReject = async (motivo: string) => {
+    if (!reject) return;
+    const id = reject.id; setReject(null);
+    try { await api.rechazarTicket(id, motivo); await reload(); }
+    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
+  };
+  const confirmValidate = async (_obs: string) => {
+    if (!validate) return;
+    const id = validate.id; setValidate(null);
+    // observación opcional — la API actual sólo expone PUT /tickets/{id}/finalizar
+    try { await api.finalizarTicket(id); await reload(); }
+    catch (e) { alert(e instanceof Error ? e.message : "Error"); }
+  };
 
   return (
     <div className="space-y-6">
@@ -91,28 +99,58 @@ function Bandeja() {
 
       {err && <ErrorBox message={err} />}
       {loading ? (
-        <div className="rounded-xl border border-border bg-surface/60 p-12 text-center text-sm text-muted-foreground">
-          Cargando tickets…
-        </div>
+        <Spinner />
       ) : (
         <TicketTable
           tickets={visible}
-          getActions={(t) => {
-            const e = (t.estado || "").toUpperCase();
-            if (e === "CREADO" || e === "DEVUELTO")
-              return [
-                { kind: "aceptar", onClick: aceptar },
-                { kind: "rechazar", onClick: rechazar },
-              ];
-            if (e === "ASIGNADO")
-              return [
-                { kind: "finalizar", onClick: finalizar },
-                { kind: "rechazar", onClick: rechazar },
-              ];
-            return [];
-          }}
+          getActions={(t) => actionsForSoporte(t, { aceptar, reject: setReject, validate: setValidate })}
         />
       )}
+
+      <PromptModal
+        open={!!reject}
+        title={`Rechazar ticket #${reject?.id ?? ""}`}
+        description="Indica el motivo del rechazo para el solicitante."
+        placeholder="Motivo del rechazo…"
+        confirmLabel="Rechazar"
+        variant="danger"
+        onCancel={() => setReject(null)}
+        onConfirm={confirmReject}
+      />
+      <PromptModal
+        open={!!validate}
+        title={`Enviar #${validate?.id ?? ""} a validación`}
+        description="Comparte una observación opcional para el solicitante."
+        placeholder="Observación (opcional)…"
+        confirmLabel="Enviar"
+        required={false}
+        onCancel={() => setValidate(null)}
+        onConfirm={confirmValidate}
+      />
     </div>
   );
+}
+
+import type { Action } from "@/components/TicketTable";
+
+export function actionsForSoporte(
+  t: Ticket,
+  h: {
+    aceptar: (t: Ticket) => void;
+    reject: (t: Ticket) => void;
+    validate: (t: Ticket) => void;
+  },
+): Action[] {
+  const e = (t.estado || "").toUpperCase();
+  if (e === "CREADO")
+    return [
+      { kind: "aceptar", onClick: h.aceptar },
+      { kind: "rechazar", onClick: h.reject },
+    ];
+  if (e === "ASIGNADO" || e === "DEVUELTO")
+    return [
+      { kind: "validacion", onClick: h.validate },
+      { kind: "rechazar", onClick: h.reject },
+    ];
+  return [];
 }
