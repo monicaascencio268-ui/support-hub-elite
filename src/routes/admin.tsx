@@ -93,15 +93,10 @@ function AdminPanel() {
         onCancel={() => setReject(null)}
         onConfirm={confirmReject}
       />
-      <PromptModal
-        open={!!validate}
-        title={`Enviar #${validate?.id ?? ""} a validación`}
-        description="Observación opcional para el solicitante."
-        placeholder="Observación (opcional)…"
-        confirmLabel="Enviar"
-        required={false}
-        onCancel={() => setValidate(null)}
-        onConfirm={confirmValidate}
+      <Toast
+        message={toast?.msg ?? null}
+        variant={toast?.v ?? "success"}
+        onClose={() => setToast(null)}
       />
     </div>
   );
