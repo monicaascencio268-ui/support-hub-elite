@@ -84,6 +84,7 @@
   --status-returned: oklch(0.72 0.16 40);     /* orange */
   --status-finished: oklch(0.74 0.16 155);    /* green */
   --status-rejected: oklch(0.68 0.22 25);     /* red */
+  --status-validated: oklch(0.74 0.12 195);   /* teal */
 }
 
 @layer base {
