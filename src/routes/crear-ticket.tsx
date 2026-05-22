@@ -17,6 +17,7 @@ function CrearTicket() {
   const navigate = useNavigate();
   const [correlativo, setCorrelativo] = useState("");
   const [detalles, setDetalles] = useState("");
+  const [foto, setFoto] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
@@ -29,8 +30,8 @@ function CrearTicket() {
     setOk(null);
     setLoading(true);
     try {
-      const t = await api.createTicket({ correlativo, detalles, id_solicitante: user.id });
-      setOk(`Ticket creado con ID #${t.id}. Redirigiendo…`);
+      const t = await api.createTicket({ correlativo, detalles, id_solicitante: user.id, foto });
+      setOk(`Ticket creado con ID #${t?.id ?? ""}. Redirigiendo…`);
       setTimeout(() => navigate({ to: "/mis-tickets" }), 900);
     } catch (e) {
       if (e instanceof ApiError && e.status === 400) setErr(e.message || "Datos inválidos. Revisa los campos.");
