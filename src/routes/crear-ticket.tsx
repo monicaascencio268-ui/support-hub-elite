@@ -68,6 +68,14 @@ function CrearTicket() {
             placeholder="Describe el problema, pasos para reproducirlo y comportamiento esperado."
           />
         </Field>
+        <Field label="Adjuntar archivo (opcional)">
+          <input
+            type="file"
+            onChange={(e) => setFoto(e.target.files?.[0] ?? null)}
+            className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground hover:file:brightness-110"
+          />
+          {foto && <p className="mt-1 text-[11px] text-muted-foreground">Seleccionado: {foto.name}</p>}
+        </Field>
 
         {err && (
           <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">{err}</p>
