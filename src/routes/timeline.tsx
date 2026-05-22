@@ -66,24 +66,41 @@ function Timeline() {
         </div>
       ) : (
         <ol className="relative space-y-5 border-l border-border/60 pl-5">
-          {logs.map((ev, i) => (
-            <li key={ev.id ?? i} className="relative">
-              <span className="absolute -left-[26px] top-1.5 grid h-3 w-3 place-items-center rounded-full bg-primary ring-4 ring-background" />
-              <div className="rounded-xl border border-border bg-surface/60 p-4">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="text-sm font-semibold">{ev.accion}</p>
-                  <time className="text-[11px] text-muted-foreground">{fmt(ev.fecha)}</time>
+          {logs.map((ev, i) => {
+            const color = accionColor(ev.accion);
+            return (
+              <li key={ev.id ?? i} className="relative">
+                <span
+                  className="absolute -left-[26px] top-1.5 grid h-3 w-3 place-items-center rounded-full ring-4 ring-background"
+                  style={{ background: `var(--color-${color})` }}
+                />
+                <div className="rounded-xl border border-border bg-surface/60 p-4">
+                  <p className={`text-sm font-bold text-${color}`}>{ev.accion}</p>
+                  {ev.descripcion && (
+                    <p className="mt-1.5 text-sm text-muted-foreground">{ev.descripcion}</p>
+                  )}
+                  {ev.fecha && (
+                    <time className="mt-2 block text-[11px] text-muted-foreground">{fmt(ev.fecha)}</time>
+                  )}
                 </div>
-                {ev.descripcion && (
-                  <p className="mt-1.5 text-sm text-muted-foreground">{ev.descripcion}</p>
-                )}
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ol>
       )}
     </div>
   );
+}
+
+function accionColor(accion: string): string {
+  const k = (accion || "").toUpperCase();
+  if (k.includes("CREAD")) return "status-created";
+  if (k.includes("ASIGN")) return "status-assigned";
+  if (k.includes("RECHAZ")) return "status-rejected";
+  if (k.includes("FINALIZ")) return "status-finished";
+  if (k.includes("VALID")) return "status-validated";
+  if (k.includes("DEVUEL")) return "status-returned";
+  return "primary";
 }
 
 function fmt(iso: string) {
