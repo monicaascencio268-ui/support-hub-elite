@@ -67,7 +67,7 @@ function Timeline() {
       ) : (
         <ol className="relative space-y-5 border-l border-border/60 pl-5">
           {logs.map((ev, i) => {
-            const color = accionColor(ev.accion);
+            const { text, varName } = accionColor(ev.accion);
             return (
               <li key={ev.id ?? i} className="relative">
                 <span
