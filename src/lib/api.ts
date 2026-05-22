@@ -69,8 +69,20 @@ export const api = {
   listTickets: () => request<Ticket[]>("/tickets"),
   listTicketsByUsuario: (id: number, rol: string) =>
     request<Ticket[]>(`/tickets/usuario/${id}/${rol}`),
-  createTicket: (t: { correlativo: string; detalles: string; id_solicitante: number }) =>
-    request<Ticket>("/tickets", { method: "POST", body: JSON.stringify(t) }),
+  createTicket: async (t: { correlativo: string; detalles: string; id_solicitante: number; foto?: File | null }) => {
+    const fd = new FormData();
+    fd.append("correlativo", t.correlativo);
+    fd.append("detalles", t.detalles);
+    fd.append("id_solicitante", String(t.id_solicitante));
+    if (t.foto) fd.append("foto", t.foto);
+    const res = await fetch(`${API_BASE}/tickets`, { method: "POST", body: fd });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new ApiError(res.status, text || `${res.status} ${res.statusText}`);
+    }
+    const ct = res.headers.get("content-type") || "";
+    return (ct.includes("application/json") ? await res.json() : await res.text()) as Ticket;
+  },
   aceptarTicket: (id: number, soporteId: number) =>
     request<unknown>(`/tickets/${id}/aceptar/${soporteId}`, { method: "PUT" }),
   finalizarTicket: (id: number) =>
