@@ -73,7 +73,7 @@ function MisTickets() {
         <TicketTable
           tickets={tickets}
           getActions={(t) =>
-            (t.estado || "").toUpperCase() === "VALIDACION"
+            (t.estado || "").toUpperCase() === "FINALIZADO"
               ? [
                   { kind: "aprobar", onClick: aprobar },
                   { kind: "rechazar", onClick: (tk) => setReject(tk) },

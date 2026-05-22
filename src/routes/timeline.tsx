@@ -66,24 +66,41 @@ function Timeline() {
         </div>
       ) : (
         <ol className="relative space-y-5 border-l border-border/60 pl-5">
-          {logs.map((ev, i) => (
-            <li key={ev.id ?? i} className="relative">
-              <span className="absolute -left-[26px] top-1.5 grid h-3 w-3 place-items-center rounded-full bg-primary ring-4 ring-background" />
-              <div className="rounded-xl border border-border bg-surface/60 p-4">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="text-sm font-semibold">{ev.accion}</p>
-                  <time className="text-[11px] text-muted-foreground">{fmt(ev.fecha)}</time>
+          {logs.map((ev, i) => {
+            const { text, cssVar } = accionColor(ev.accion);
+            return (
+              <li key={ev.id ?? i} className="relative">
+                <span
+                  className="absolute -left-[26px] top-1.5 grid h-3 w-3 place-items-center rounded-full ring-4 ring-background"
+                  style={{ background: `var(${cssVar})` }}
+                />
+                <div className="rounded-xl border border-border bg-surface/60 p-4">
+                  <p className={`text-sm font-bold ${text}`}>{ev.accion}</p>
+                  {ev.descripcion && (
+                    <p className="mt-1.5 text-sm text-muted-foreground">{ev.descripcion}</p>
+                  )}
+                  {ev.fecha && (
+                    <time className="mt-2 block text-[11px] text-muted-foreground">{fmt(ev.fecha)}</time>
+                  )}
                 </div>
-                {ev.descripcion && (
-                  <p className="mt-1.5 text-sm text-muted-foreground">{ev.descripcion}</p>
-                )}
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ol>
       )}
     </div>
   );
+}
+
+function accionColor(accion: string): { text: string; cssVar: string } {
+  const k = (accion || "").toUpperCase();
+  if (k.includes("CREAD"))   return { text: "text-status-created",   cssVar: "--color-status-created" };
+  if (k.includes("ASIGN"))   return { text: "text-status-assigned",  cssVar: "--color-status-assigned" };
+  if (k.includes("RECHAZ"))  return { text: "text-status-rejected",  cssVar: "--color-status-rejected" };
+  if (k.includes("FINALIZ")) return { text: "text-status-finished",  cssVar: "--color-status-finished" };
+  if (k.includes("VALID"))   return { text: "text-status-validated", cssVar: "--color-status-validated" };
+  if (k.includes("DEVUEL"))  return { text: "text-status-returned",  cssVar: "--color-status-returned" };
+  return { text: "text-primary", cssVar: "--color-primary" };
 }
 
 function fmt(iso: string) {

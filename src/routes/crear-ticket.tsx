@@ -17,6 +17,7 @@ function CrearTicket() {
   const navigate = useNavigate();
   const [correlativo, setCorrelativo] = useState("");
   const [detalles, setDetalles] = useState("");
+  const [foto, setFoto] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
@@ -29,8 +30,8 @@ function CrearTicket() {
     setOk(null);
     setLoading(true);
     try {
-      const t = await api.createTicket({ correlativo, detalles, id_solicitante: user.id });
-      setOk(`Ticket creado con ID #${t.id}. Redirigiendo…`);
+      const t = await api.createTicket({ correlativo, detalles, id_solicitante: user.id, foto });
+      setOk(`Ticket creado con ID #${t?.id ?? ""}. Redirigiendo…`);
       setTimeout(() => navigate({ to: "/mis-tickets" }), 900);
     } catch (e) {
       if (e instanceof ApiError && e.status === 400) setErr(e.message || "Datos inválidos. Revisa los campos.");
@@ -66,6 +67,14 @@ function CrearTicket() {
             className="w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-ring/40"
             placeholder="Describe el problema, pasos para reproducirlo y comportamiento esperado."
           />
+        </Field>
+        <Field label="Adjuntar archivo (opcional)">
+          <input
+            type="file"
+            onChange={(e) => setFoto(e.target.files?.[0] ?? null)}
+            className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground hover:file:brightness-110"
+          />
+          {foto && <p className="mt-1 text-[11px] text-muted-foreground">Seleccionado: {foto.name}</p>}
         </Field>
 
         {err && (
