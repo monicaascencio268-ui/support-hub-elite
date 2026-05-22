@@ -82,9 +82,9 @@
   --status-assigned: oklch(0.78 0.15 80);     /* amber */
   --status-validation: oklch(0.7 0.18 300);   /* purple */
   --status-returned: oklch(0.72 0.16 40);     /* orange */
-  --status-finished: oklch(0.74 0.16 155);    /* green */
+  --status-finished: oklch(0.7 0.18 300);     /* purple (awaiting validation) */
   --status-rejected: oklch(0.68 0.22 25);     /* red */
-  --status-validated: oklch(0.74 0.12 195);   /* teal */
+  --status-validated: oklch(0.74 0.16 155);   /* green (closed) */
 }
 
 @layer base {
