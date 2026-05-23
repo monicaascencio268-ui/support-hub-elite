@@ -105,13 +105,21 @@ function AdminPanel() {
 
 function UsuariosTable({ usuarios, onChanged }: { usuarios: Usuario[]; onChanged: () => void }) {
   const [confirmU, setConfirmU] = useState<Usuario | null>(null);
-
   const [delErr, setDelErr] = useState<string | null>(null);
-  const doDelete = async () => {
-    if (!confirmU) return;
-    const id = confirmU.id; setConfirmU(null);
-    try { await api.deleteUsuario(id); setDelErr(null); onChanged(); }
-    catch (e) { setDelErr(e instanceof Error ? e.message : "Error eliminando usuario"); }
+
+  const doDelete = async (u: Usuario) => {
+    setConfirmU(null);
+    setDelErr(null);
+    try {
+      await api.deleteUsuario(u.id);
+      onChanged();
+    } catch (e) {
+      if (e instanceof ApiError || e instanceof Error) {
+        setDelErr("No se puede eliminar: el usuario tiene tickets asociados.");
+      } else {
+        setDelErr("Error eliminando usuario.");
+      }
+    }
   };
 
   return (
