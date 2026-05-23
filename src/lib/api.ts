@@ -29,6 +29,14 @@ export interface LogEntry {
   archivo?: string | null;
 }
 
+export interface Archivo {
+  id: number;
+  id_ticket: number;
+  nombre_archivo: string;
+  ruta_archivo: string;
+  tipo: string;
+}
+
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
@@ -98,4 +106,8 @@ export const api = {
 
   // Logs
   ticketLogs: (id: number) => request<LogEntry[]>(`/logs/ticket/${id}`),
+
+  // Archivos
+  listArchivos: (idTicket: number) =>
+    request<Archivo[]>(`/archivos/ticket/${idTicket}`),
 };
