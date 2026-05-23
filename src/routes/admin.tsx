@@ -5,7 +5,7 @@ import { TicketTable } from "@/components/TicketTable";
 import { PromptModal } from "@/components/PromptModal";
 import { Spinner, EmptyState } from "@/components/Feedback";
 import { Toast } from "@/components/Toast";
-import { api, type Role, type Ticket, type Usuario } from "@/lib/api";
+import { api, ApiError, type Role, type Ticket, type Usuario } from "@/lib/api";
 import { getUsuario } from "@/lib/auth";
 import { ErrorBox } from "./mis-tickets";
 import { actionsForSoporte } from "./bandeja-soporte";
