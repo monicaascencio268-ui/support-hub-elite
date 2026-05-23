@@ -122,7 +122,7 @@ function Timeline() {
           <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-border border-t-primary align-middle" />
           <span className="ml-2 align-middle">Cargando archivos…</span>
         </div>
-      ) : archivos.length > 2 && (
+      ) : archivos.length > 0 && (
         <section className="rounded-xl border border-border bg-surface/60 p-5">
           <h2 className="mb-4 text-lg font-semibold tracking-tight">Archivos adjuntos</h2>
           <div className="grid gap-4 sm:grid-cols-2">
