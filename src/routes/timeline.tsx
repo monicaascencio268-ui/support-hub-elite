@@ -14,7 +14,8 @@ export const Route = createFileRoute("/timeline")({
 });
 
 function Timeline() {
-  const { id } = Route.useSearch();
+  const search = Route.useSearch();
+  const id = search.id || (typeof window !== "undefined" ? Number(new URLSearchParams(window.location.search).get("id")) || 0 : 0);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
