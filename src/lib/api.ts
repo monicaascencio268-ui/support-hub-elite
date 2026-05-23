@@ -26,6 +26,7 @@ export interface LogEntry {
   accion: string;
   descripcion: string;
   fecha: string;
+  archivo?: string | null;
 }
 
 export class ApiError extends Error {
