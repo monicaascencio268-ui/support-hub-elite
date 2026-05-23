@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TimelineRouteImport } from './routes/timeline'
+import { Route as MisTicketsSoporteRouteImport } from './routes/mis-tickets-soporte'
 import { Route as MisTicketsRouteImport } from './routes/mis-tickets'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CrearTicketRouteImport } from './routes/crear-ticket'
@@ -20,6 +21,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const TimelineRoute = TimelineRouteImport.update({
   id: '/timeline',
   path: '/timeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MisTicketsSoporteRoute = MisTicketsSoporteRouteImport.update({
+  id: '/mis-tickets-soporte',
+  path: '/mis-tickets-soporte',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MisTicketsRoute = MisTicketsRouteImport.update({
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/crear-ticket': typeof CrearTicketRoute
   '/login': typeof LoginRoute
   '/mis-tickets': typeof MisTicketsRoute
+  '/mis-tickets-soporte': typeof MisTicketsSoporteRoute
   '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/crear-ticket': typeof CrearTicketRoute
   '/login': typeof LoginRoute
   '/mis-tickets': typeof MisTicketsRoute
+  '/mis-tickets-soporte': typeof MisTicketsSoporteRoute
   '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/crear-ticket': typeof CrearTicketRoute
   '/login': typeof LoginRoute
   '/mis-tickets': typeof MisTicketsRoute
+  '/mis-tickets-soporte': typeof MisTicketsSoporteRoute
   '/timeline': typeof TimelineRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/crear-ticket'
     | '/login'
     | '/mis-tickets'
+    | '/mis-tickets-soporte'
     | '/timeline'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/crear-ticket'
     | '/login'
     | '/mis-tickets'
+    | '/mis-tickets-soporte'
     | '/timeline'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/crear-ticket'
     | '/login'
     | '/mis-tickets'
+    | '/mis-tickets-soporte'
     | '/timeline'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   CrearTicketRoute: typeof CrearTicketRoute
   LoginRoute: typeof LoginRoute
   MisTicketsRoute: typeof MisTicketsRoute
+  MisTicketsSoporteRoute: typeof MisTicketsSoporteRoute
   TimelineRoute: typeof TimelineRoute
 }
 
@@ -128,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/timeline'
       fullPath: '/timeline'
       preLoaderRoute: typeof TimelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mis-tickets-soporte': {
+      id: '/mis-tickets-soporte'
+      path: '/mis-tickets-soporte'
+      fullPath: '/mis-tickets-soporte'
+      preLoaderRoute: typeof MisTicketsSoporteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mis-tickets': {
@@ -182,18 +202,9 @@ const rootRouteChildren: RootRouteChildren = {
   CrearTicketRoute: CrearTicketRoute,
   LoginRoute: LoginRoute,
   MisTicketsRoute: MisTicketsRoute,
+  MisTicketsSoporteRoute: MisTicketsSoporteRoute,
   TimelineRoute: TimelineRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

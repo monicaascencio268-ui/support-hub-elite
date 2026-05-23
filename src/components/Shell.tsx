@@ -50,6 +50,25 @@ export function Shell({ children, allow }: Props) {
             </div>
           </Link>
 
+          {user.rol === "soporte" && (
+            <nav className="hidden items-center gap-1 md:flex">
+              <Link
+                to="/mis-tickets-soporte"
+                activeProps={{ className: "bg-secondary text-foreground" }}
+                className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+              >
+                Mis Tickets
+              </Link>
+              <Link
+                to="/bandeja-soporte"
+                activeProps={{ className: "bg-secondary text-foreground" }}
+                className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+              >
+                Bandeja General
+              </Link>
+            </nav>
+          )}
+
           <div className="flex items-center gap-3">
             <div className="hidden items-center gap-2 sm:flex">
               <div className="text-right">
