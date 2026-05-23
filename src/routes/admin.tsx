@@ -171,7 +171,7 @@ function UsuariosTable({ usuarios, onChanged }: { usuarios: Usuario[]; onChanged
         confirmLabel="Eliminar"
         variant="danger"
         onCancel={() => setConfirmU(null)}
-        onConfirm={(v) => { if (v.trim().toUpperCase() === "ELIMINAR") void doDelete(); }}
+        onConfirm={(v) => { if (confirmU && v.trim().toUpperCase() === "ELIMINAR") void doDelete(confirmU); }}
       />
     </div>
   );
