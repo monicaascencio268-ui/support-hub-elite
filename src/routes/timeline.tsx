@@ -80,6 +80,16 @@ function Timeline() {
                   {ev.descripcion && (
                     <p className="mt-1.5 text-sm text-muted-foreground">{ev.descripcion}</p>
                   )}
+                  {ev.archivo && (
+                    <a
+                      href={`http://localhost:8080/ITProject/it/tickets/archivo/${encodeURIComponent(ev.archivo)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-elevated/60 px-2.5 py-1 text-[11px] font-medium text-primary hover:bg-secondary"
+                    >
+                      📎 Descargar {ev.archivo}
+                    </a>
+                  )}
                   {ev.fecha && (
                     <time className="mt-2 block text-[11px] text-muted-foreground">{fmt(ev.fecha)}</time>
                   )}
