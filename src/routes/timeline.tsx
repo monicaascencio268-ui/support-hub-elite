@@ -14,7 +14,8 @@ export const Route = createFileRoute("/timeline")({
 });
 
 function Timeline() {
-  const { id } = Route.useSearch();
+  const search = Route.useSearch();
+  const id = search.id || (typeof window !== "undefined" ? Number(new URLSearchParams(window.location.search).get("id")) || 0 : 0);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -78,6 +79,16 @@ function Timeline() {
                   <p className={`text-sm font-bold ${text}`}>{ev.accion}</p>
                   {ev.descripcion && (
                     <p className="mt-1.5 text-sm text-muted-foreground">{ev.descripcion}</p>
+                  )}
+                  {ev.archivo && (
+                    <a
+                      href={`http://localhost:8080/ITProject/it/tickets/archivo/${encodeURIComponent(ev.archivo)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-elevated/60 px-2.5 py-1 text-[11px] font-medium text-primary hover:bg-secondary"
+                    >
+                      📎 Descargar {ev.archivo}
+                    </a>
                   )}
                   {ev.fecha && (
                     <time className="mt-2 block text-[11px] text-muted-foreground">{fmt(ev.fecha)}</time>

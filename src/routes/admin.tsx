@@ -5,7 +5,7 @@ import { TicketTable } from "@/components/TicketTable";
 import { PromptModal } from "@/components/PromptModal";
 import { Spinner, EmptyState } from "@/components/Feedback";
 import { Toast } from "@/components/Toast";
-import { api, type Role, type Ticket, type Usuario } from "@/lib/api";
+import { api, ApiError, type Role, type Ticket, type Usuario } from "@/lib/api";
 import { getUsuario } from "@/lib/auth";
 import { ErrorBox } from "./mis-tickets";
 import { actionsForSoporte } from "./bandeja-soporte";
@@ -105,13 +105,21 @@ function AdminPanel() {
 
 function UsuariosTable({ usuarios, onChanged }: { usuarios: Usuario[]; onChanged: () => void }) {
   const [confirmU, setConfirmU] = useState<Usuario | null>(null);
-
   const [delErr, setDelErr] = useState<string | null>(null);
-  const doDelete = async () => {
-    if (!confirmU) return;
-    const id = confirmU.id; setConfirmU(null);
-    try { await api.deleteUsuario(id); setDelErr(null); onChanged(); }
-    catch (e) { setDelErr(e instanceof Error ? e.message : "Error eliminando usuario"); }
+
+  const doDelete = async (u: Usuario) => {
+    setConfirmU(null);
+    setDelErr(null);
+    try {
+      await api.deleteUsuario(u.id);
+      onChanged();
+    } catch (e) {
+      if (e instanceof ApiError || e instanceof Error) {
+        setDelErr("No se puede eliminar: el usuario tiene tickets asociados.");
+      } else {
+        setDelErr("Error eliminando usuario.");
+      }
+    }
   };
 
   return (
@@ -163,7 +171,7 @@ function UsuariosTable({ usuarios, onChanged }: { usuarios: Usuario[]; onChanged
         confirmLabel="Eliminar"
         variant="danger"
         onCancel={() => setConfirmU(null)}
-        onConfirm={(v) => { if (v.trim().toUpperCase() === "ELIMINAR") void doDelete(); }}
+        onConfirm={(v) => { if (confirmU && v.trim().toUpperCase() === "ELIMINAR") void doDelete(confirmU); }}
       />
     </div>
   );
